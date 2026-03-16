@@ -3,73 +3,61 @@
 # --- CONFIGURACIÓN ---
 NAME="sm-dev-refactor-public-gps-lb"
 TG_NAME="sm-dev-refactor-traccar-gps-tg"
-TARGET_AZ="us-east-1b" 
+
+# --- SUBREDES CRÍTICAS ---
+# 1a Pública (donde entra internet)
+SUBNET_1A="subnet-0f22c994da543dda1" 
+# 1b Privada (donde vive la instancia, necesaria para salud/NotInUse)
+SUBNET_1B="subnet-097dbe4aef1543f3d" 
+
 PORT=5001 
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 
-echo "🔍 Buscando info del Target Group: $TG_NAME..."
-TG_INFO=$(aws elbv2 describe-target-groups \
-    --names $TG_NAME \
-    --region $AWS_REGION \
-    --profile $AWS_PROFILE \
-    --query 'TargetGroups[0].[TargetGroupArn,VpcId]' --output text 2>/dev/null)
+echo "------------------------------------------------"
+echo "🚀 Paso 3: Creando NLB Multi-Zona"
+echo "------------------------------------------------"
 
-TG_ARN=$(echo $TG_INFO | awk '{print $1}')
-VPC_ID=$(echo $TG_INFO | awk '{print $2}')
+echo "🔍 Buscando ARN del Target Group..."
+TG_ARN=$(aws elbv2 describe-target-groups --names $TG_NAME --region $AWS_REGION --profile $AWS_PROFILE --query 'TargetGroups[0].TargetGroupArn' --output text)
 
-if [ -z "$TG_ARN" ] || [ "$TG_ARN" == "None" ]; then
-    echo "❌ Error: No se encontró el Target Group."
-    exit 1
-fi
-
-echo "✅ TG encontrado en la VPC: $VPC_ID"
-
-echo "🌐 Buscando CUALQUIER subnet en $TARGET_AZ que pertenezca a la VPC..."
-# Buscamos la primera subnet disponible en esa zona dentro de tu VPC
-SUBNET_ID=$(aws ec2 describe-subnets \
-    --filters "Name=vpc-id,Values=$VPC_ID" "Name=availability-zone,Values=$TARGET_AZ" \
-    --region $AWS_REGION \
-    --profile $AWS_PROFILE \
-    --query "Subnets[0].SubnetId" --output text)
-
-if [ "$SUBNET_ID" == "None" ] || [ -z "$SUBNET_ID" ]; then
-    echo "❌ Error: No existe ninguna subnet en la zona $TARGET_AZ para esta VPC."
-    exit 1
-fi
-
-echo "✅ Subnet encontrada: $SUBNET_ID"
-
-echo "🚀 Creando el Network Load Balancer Público en $SUBNET_ID..."
+echo "🏗️  Creando NLB con presencia en Zona 1a y 1b..."
 LB_ARN=$(aws elbv2 create-load-balancer \
     --name $NAME \
     --type network \
     --scheme internet-facing \
-    --subnets $SUBNET_ID \
+    --subnets $SUBNET_1A $SUBNET_1B \
     --region $AWS_REGION \
     --profile $AWS_PROFILE \
     --query 'LoadBalancers[0].LoadBalancerArn' --output text)
 
-echo "⚙️  Activando Cross-Zone..."
+if [ $? -eq 0 ]; then
+    echo "✅ NLB Creado con éxito."
+else
+    echo "❌ Error al crear el NLB."
+    exit 1
+fi
+
+echo "⚙️  Activando Cross-Zone Load Balancing en el NLB..."
 aws elbv2 modify-load-balancer-attributes \
     --load-balancer-arn $LB_ARN \
     --attributes Key=load_balancing.cross_zone.enabled,Value=true \
     --region $AWS_REGION \
     --profile $AWS_PROFILE
 
-echo "⏳ Esperando 30 segundos..."
-sleep 30
+echo "⏳ Esperando 20 segundos para estabilización..."
+sleep 20
 
-echo "🔗 Creando el Listener..."
+echo "🔗 Creando Listener TCP en puerto $PORT..."
 aws elbv2 create-listener \
     --load-balancer-arn $LB_ARN \
-    --protocol TCP \
-    --port $PORT \
+    --protocol TCP --port $PORT \
     --default-actions Type=forward,TargetGroupArn=$TG_ARN \
-    --region $AWS_REGION \
-    --profile $AWS_PROFILE
+    --region $AWS_REGION --profile $AWS_PROFILE
 
 echo "------------------------------------------------"
-echo "✅ ¡LISTO! DNS del Balanceador:"
-aws elbv2 describe-load-balancers --load-balancer-arns $LB_ARN --region $AWS_REGION --profile $AWS_PROFILE --query 'LoadBalancers[0].DNSName' --output text
+echo "✅ ¡INFRAESTRUCTURA CREADA!"
+DNS_NAME=$(aws elbv2 describe-load-balancers --load-balancer-arns $LB_ARN --region $AWS_REGION --profile $AWS_PROFILE --query 'LoadBalancers[0].DNSName' --output text)
+echo "🔗 DNS: $DNS_NAME"
+echo "Siguiente paso: ./traccar_nbl_create_paso_4_verify_nbl.sh"
 echo "------------------------------------------------"
