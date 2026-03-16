@@ -3,6 +3,7 @@
 # --- CONFIGURACIÓN ---
 NAME="sm-dev-refactor-public-gps-lb"
 TG_NAME="sm-dev-refactor-traccar-gps-tg"
+TARGET_AZ="us-east-1b" 
 PORT=5001 
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
@@ -24,42 +25,37 @@ fi
 
 echo "✅ TG encontrado en la VPC: $VPC_ID"
 
-echo "🌐 Buscando subnets públicas únicas por zona en la VPC $VPC_ID..."
-
-# Esta es la parte mágica: busca subnets con IGW, pero filtra para que solo salga UNA por Availability Zone
-SUBNETS=$(aws ec2 describe-subnets \
-    --filters "Name=vpc-id,Values=$VPC_ID" \
+echo "🌐 Buscando CUALQUIER subnet en $TARGET_AZ que pertenezca a la VPC..."
+# Buscamos la primera subnet disponible en esa zona dentro de tu VPC
+SUBNET_ID=$(aws ec2 describe-subnets \
+    --filters "Name=vpc-id,Values=$VPC_ID" "Name=availability-zone,Values=$TARGET_AZ" \
     --region $AWS_REGION \
     --profile $AWS_PROFILE \
-    --query "Subnets[?MapPublicIpOnLaunch==\`true\`]" \
-    --output json | jq -r '[.[] | {SubnetId, AvailabilityZone}] | unique_by(.AvailabilityZone) | .[].SubnetId' | xargs)
+    --query "Subnets[0].SubnetId" --output text)
 
-# Si el comando de arriba no te funciona (por falta de jq), usa esta versión simplificada que toma las primeras 2 de la lista previa:
-if [ -z "$SUBNETS" ]; then
-    SUBNETS=$(aws ec2 describe-route-tables \
-        --filters "Name=vpc-id,Values=$VPC_ID" \
-        --region $AWS_REGION \
-        --profile $AWS_PROFILE \
-        --query "RouteTables[?Routes[?GatewayId != null && starts_with(GatewayId, 'igw-')]].Associations[0].SubnetId" \
-        --output text | head -n 1) # Tomamos solo una para ir a la fija
-fi
-
-if [ -z "$SUBNETS" ] || [ "$SUBNETS" == "None" ]; then
-    echo "❌ Error: No encontré subnets públicas."
+if [ "$SUBNET_ID" == "None" ] || [ -z "$SUBNET_ID" ]; then
+    echo "❌ Error: No existe ninguna subnet en la zona $TARGET_AZ para esta VPC."
     exit 1
 fi
 
-echo "✅ Usando subnet(s): $SUBNETS"
+echo "✅ Subnet encontrada: $SUBNET_ID"
 
-echo "🚀 Creando el Network Load Balancer Público..."
+echo "🚀 Creando el Network Load Balancer Público en $SUBNET_ID..."
 LB_ARN=$(aws elbv2 create-load-balancer \
     --name $NAME \
     --type network \
     --scheme internet-facing \
-    --subnets $SUBNETS \
+    --subnets $SUBNET_ID \
     --region $AWS_REGION \
     --profile $AWS_PROFILE \
     --query 'LoadBalancers[0].LoadBalancerArn' --output text)
+
+echo "⚙️  Activando Cross-Zone..."
+aws elbv2 modify-load-balancer-attributes \
+    --load-balancer-arn $LB_ARN \
+    --attributes Key=load_balancing.cross_zone.enabled,Value=true \
+    --region $AWS_REGION \
+    --profile $AWS_PROFILE
 
 echo "⏳ Esperando 30 segundos..."
 sleep 30
@@ -74,6 +70,6 @@ aws elbv2 create-listener \
     --profile $AWS_PROFILE
 
 echo "------------------------------------------------"
-echo "✅ ¡LISTO, PARCE! Balanceador creado con éxito."
+echo "✅ ¡LISTO! DNS del Balanceador:"
 aws elbv2 describe-load-balancers --load-balancer-arns $LB_ARN --region $AWS_REGION --profile $AWS_PROFILE --query 'LoadBalancers[0].DNSName' --output text
 echo "------------------------------------------------"
