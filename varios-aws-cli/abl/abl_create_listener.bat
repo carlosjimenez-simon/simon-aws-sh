@@ -4,7 +4,7 @@ setlocal enabledelayedexpansion
 :: --- CONFIGURACIÓN ---
 set LB_ARN=arn:aws:elasticloadbalancing:us-east-1:707925622299:loadbalancer/net/sm-dev-refactor-public-gps-lb/d8c57598fdc399c8
 set PORT=5027
-set TG_ARN=arn:aws:elasticloadbalancing:us-east-1:707925622299:targetgroup/sm-dev-refactor-traccar-gps-tg/968b88153c5e964a
+set TG_ARN=arn:aws:elasticloadbalancing:us-east-1:707925622299:targetgroup/sm-dev-refactor-traccar-gpstk-tg/794cd9ea42389b26
 set AWS_PROFILE=AdministratorAccess-707925622299
 set AWS_REGION=us-east-1
 

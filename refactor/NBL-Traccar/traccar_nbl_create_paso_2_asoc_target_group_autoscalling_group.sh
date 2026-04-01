@@ -2,7 +2,7 @@
 
 # --- CONFIGURACIÓN ---
 ASG_NAME="sm-dev-refactor-gps" 
-TG_NAME="sm-dev-refactor-traccar-gps-tg" # Ahora usamos el nombre
+TG_NAME="sm-dev-refactor-traccar-gpstk-tg" # Ahora usamos el nombre
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 

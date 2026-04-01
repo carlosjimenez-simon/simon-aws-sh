@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --- CONFIGURACIÓN ---
-TG_NAME="sm-dev-refactor-traccar-gps-tg"
+TG_NAME="sm-dev-refactor-traccar-gps-teltonika-tg"
 ASG_NAME="sm-dev-refactor-gps"
 VPC_ID="vpc-04c3946b71fc75d88"
 PORT=5001
