@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # --- CONFIGURACIÓN ---
-TG_NAME="sm-dev-refactor-traccar-gps-tg"
-LB_NAME="sm-dev-refactor-public-gps-lb"
+TG_NAME="sm-dev-refactor-msg-queue-ope-tg"
+LB_NAME="sm-dev-refactor-message-queue-lb"
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 

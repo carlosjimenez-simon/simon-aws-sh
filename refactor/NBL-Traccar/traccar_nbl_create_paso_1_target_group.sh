@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # --- CONFIGURACIÓN ---
-TG_NAME="sm-dev-refactor-traccar-gps-tg"
-ASG_NAME="sm-dev-refactor-gps"
+TG_NAME="sm-dev-refactor-msg-queue-ope-tg"
+ASG_NAME="sm-dev-refactor-message-queue-asg"
 VPC_ID="vpc-04c3946b71fc75d88"
-PORT=5001
+PORT=15672
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 
