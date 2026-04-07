@@ -1,10 +1,9 @@
 #!/bin/bash
 
 # --- CONFIGURACIÓN ---
-TG_NAME="sm-dev-refactor-msg-queue-ope-tg"
-ASG_NAME="sm-dev-refactor-message-queue-asg"
+TG_NAME="sm-dev-refactor-alfresco-tg"
 VPC_ID="vpc-04c3946b71fc75d88"
-PORT=15672
+PORT=60000
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 

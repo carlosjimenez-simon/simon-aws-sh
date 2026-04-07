@@ -2,10 +2,9 @@
 setlocal enabledelayedexpansion
 
 :: --- CONFIGURACIÓN ---
-set TG_NAME=sm-dev-refactor-traccar-gpstk-tg
-set ASG_NAME=sm-dev-refactor-gps
+set TG_NAME=sm-dev-refactor-alfresco-tg
 set VPC_ID=vpc-04c3946b71fc75d88
-set PORT=5027
+set PORT=60000
 set AWS_PROFILE=AdministratorAccess-707925622299
 set AWS_REGION=us-east-1
 

@@ -1,4 +1,4 @@
-TG_ARN="arn:aws:elasticloadbalancing:us-east-1:707925622299:targetgroup/tg-refactor-message-queue-tcp/aae8e73d3bae15cd"
+TG_ARN="arn:aws:elasticloadbalancing:us-east-1:707925622299:targetgroup/sm-dev-refactor-alfresco-tg/0764890d9815d1c1"
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 

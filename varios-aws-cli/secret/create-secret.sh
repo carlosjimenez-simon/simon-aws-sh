@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # --- Configuración ---
-SECRET_NAME="dev/refactor/postgres"
+SECRET_NAME="dev/payment-gateway/assistya"
 REGION="us-east-1"
-FILE_PATH="secret-for-refactor.json" # El archivo que contiene los valores
+FILE_PATH="secret-assistya-for-payment-gateway.json" # El archivo que contiene los valores
 
 # --- Ejecución ---
 echo "🚀 Creando secreto: $SECRET_NAME..."
