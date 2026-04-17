@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # --- Configuración ---
-SECRET_NAME="dev/payment-gateway/assistya"
+SECRET_NAME="dev/polizas/mundial-seguros"
 REGION="us-east-1"
-FILE_PATH="secret-assistya-for-payment-gateway.json" # El archivo que contiene los valores
+FILE_PATH="secret-simon-for-mundial-seguros.json" # El archivo que contiene los valores
 
 # --- Ejecución ---
 echo "🚀 Creando secreto: $SECRET_NAME..."
