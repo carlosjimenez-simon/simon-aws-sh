@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # --- Configuración ---
-SECRET_NAME="dev/polizas/mundial-seguros"
+SECRET_NAME="dev/simon-pay/intermediator"
 REGION="us-east-1"
-FILE_PATH="secret-simon-for-mundial-seguros.json" # El archivo que contiene los valores
+FILE_PATH="secret_for_simon_pay.json" # El archivo que contiene los valores
 
 # --- Ejecución ---
 echo "🚀 Creando secreto: $SECRET_NAME..."
