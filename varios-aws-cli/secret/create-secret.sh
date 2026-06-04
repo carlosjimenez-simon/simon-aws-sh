@@ -1,16 +1,16 @@
 #!/bin/bash
 
 # --- Configuración ---
-SECRET_NAME="dev/simon-pay/intermediator"
+SECRET_NAME="dev/simon-spring-camel/client/for-insurance"
 REGION="us-east-1"
-FILE_PATH="secret_for_simon_pay.json" # El archivo que contiene los valores
+FILE_PATH="secret_for_client_generic.json" # El archivo que contiene los valores
 
 # --- Ejecución ---
 echo "🚀 Creando secreto: $SECRET_NAME..."
 
 aws secretsmanager create-secret \
     --name "$SECRET_NAME" \
-    --description "Configuración de RabbitMQ para el refactor de API GW" \
+    --description "Secreto para alcanzar camel y consumir los servicios de mundial de seguros" \
     --secret-string file://"$FILE_PATH" \
     --region "$REGION"
 

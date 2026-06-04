@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --- Configuración ---
-SECRET_NAME="dev/refactor/postgres"
+SECRET_NAME="dev/simon-spring-camel/client/for-vehicles"
 REGION="us-east-1"
 # Días que AWS guarda el secreto antes de borrarlo definitivamente (7 a 30)
 RECOVERY_WINDOW=7 
