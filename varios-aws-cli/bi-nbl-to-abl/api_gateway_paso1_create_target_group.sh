@@ -1,58 +1,54 @@
 #!/bin/bash
 
 # --- CONFIGURACIÓN ---
-#-- para keycloak: sm-dev-bi-keycloak-tg
-#-- para api-gateway sm-dev-bi-api-gateway-tg
-
-TG_NAME="sm-dev-bi-api-gateway-tg"
+# Nota: Recuerda cambiar el nombre para el de Keycloak cuando lo vayas a montar (ej: sm-dev-bi-keycloak-alb-tg)
+TG_NAME="sm-dev-bi-api-gateway-alb-tg" 
 VPC_ID="vpc-04c3946b71fc75d88"
-PORT=9090
+PORT=9090 # El puerto en el que escucha tu API Gateway en el ALB
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 
 echo "------------------------------------------------"
-echo "🎯 Paso 1: Creando Target Group para Traccar"
+echo "🎯 Paso 1: Creando Target Group (NLB -> ALB)"
 echo "------------------------------------------------"
 
-# 1. Crear el Target Group
+# 1. Crear el Target Group tipo ALB
+# Cambios clave: --target-type alb  y  --protocol TCP_UDP
 TG_ARN=$(aws elbv2 create-target-group \
-    --name $TG_NAME \
+    --name "$TG_NAME" \
     --protocol TCP \
     --port $PORT \
     --vpc-id $VPC_ID \
-    --target-type instance \
+    --target-type alb \
     --region $AWS_REGION \
     --profile $AWS_PROFILE \
     --query 'TargetGroups[0].TargetGroupArn' --output text)
 
 if [ $? -eq 0 ] && [ "$TG_ARN" != "None" ]; then
-    echo "✅ Target Group creado: $TG_ARN"
+    echo "✅ Target Group tipo ALB creado: $TG_ARN"
 else
     echo "❌ Error al crear el Target Group."
     exit 1
 fi
 
-echo "⚙️  Configurando atributos críticos (Cross-Zone y Proxy Mode)..."
+echo "⚙️  Configurando atributos críticos (Cross-Zone)..."
 
-# 2. Modificar atributos: 
-# - load_balancing.cross_zone.enabled=true (Para alcanzar cualquier AZ)
-# - preserve_client_ip.enabled=false (Para asegurar compatibilidad de ruteo con el NLB)
+# 2. Modificar atributos:
+# - Solo dejamos cross_zone ya que preserve_client_ip no aplica para tipo 'alb'
 aws elbv2 modify-target-group-attributes \
     --target-group-arn "$TG_ARN" \
     --attributes \
         Key=load_balancing.cross_zone.enabled,Value=true \
-        Key=preserve_client_ip.enabled,Value=false \
     --region $AWS_REGION \
     --profile $AWS_PROFILE
 
 if [ $? -eq 0 ]; then
     echo "✅ Atributos configurados correctamente."
 else
-    echo "⚠️  Error al configurar atributos, revisa los permisos del perfil."
+    echo "⚠️  Error al configurar atributos."
 fi
 
 echo "------------------------------------------------"
-echo "🚀 ¡TARGET GROUP LISTO Y OPTIMIZADO!"
-echo "Siguiente paso: ./traccar_nbl_create_paso_2_asoc_target_group_autoscalling_group.sh"
+echo "🚀 ¡TARGET GROUP LISTO PARA REGISTRAR EL ALB!"
 echo "ARN: $TG_ARN"
 echo "------------------------------------------------"

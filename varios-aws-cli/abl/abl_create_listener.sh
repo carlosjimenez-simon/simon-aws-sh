@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # --- CONFIGURACIÓN ---
-LB_ARN="arn:aws:elasticloadbalancing:us-east-1:707925622299:loadbalancer/app/sm-dev-refactor-alfresco-lb/9a5a632fd661670d"
-TG_ARN="arn:aws:elasticloadbalancing:us-east-1:707925622299:targetgroup/sm-dev-refactor-alfresco-tg/8d046a8120a347f1"
-PORT=60000
+LB_ARN="arn:aws:elasticloadbalancing:us-east-1:707925622299:loadbalancer/net/sm-dev-refactor-public-gps-lb/d8c57598fdc399c8"
+TG_ARN="arn:aws:elasticloadbalancing:us-east-1:707925622299:targetgroup/sm-dev-bi-api-gateway-tg/c67386649ce7e80b"
+PORT=9090
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 

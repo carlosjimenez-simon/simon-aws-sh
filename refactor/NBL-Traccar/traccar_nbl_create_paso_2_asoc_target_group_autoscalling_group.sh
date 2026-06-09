@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # --- CONFIGURACIÓN ---
-ASG_NAME="sm-dev-refactor-alfresco-asg" 
-TG_NAME="sm-dev-refactor-alfresco-tg" # Ahora usamos el nombre
+ASG_NAME="sm-dev-refactor-apigw-asg" 
+TG_NAME="sm-dev-bi-api-gateway-tg" # Ahora usamos el nombre
 AWS_PROFILE="AdministratorAccess-707925622299"
 AWS_REGION="us-east-1"
 
