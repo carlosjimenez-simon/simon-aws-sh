@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # --- Configuración ---
-SECRET_NAME="dev/simon-spring-camel/client/for-insurance"
+SECRET_NAME="dev/simon-refactor/finanzauto/municipalities"
 REGION="us-east-1"
 FILE_PATH="secret_for_client_generic.json" # El archivo que contiene los valores
 
